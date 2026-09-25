@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>My Calculator</title>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #101114;
+    font-family: Arial, sans-serif;
+}
+
+.calculator {
+    width: 340px;
+    padding: 22px;
+    background: #1d1f24;
+    border-radius: 28px;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.6);
+}
+
+.title {
+    text-align: center;
+    color: white;
+    font-size: 22px;
+    font-weight: bold;
+    margin-bottom: 18px;
+}
+
+#display {
+    width: 100%;
+    height: 75px;
+    border: none;
+    outline: none;
+    border-radius: 16px;
+    margin-bottom: 18px;
+    padding: 10px 15px;
+    background: #f2f2f2;
+    color: #111;
+    font-size: 30px;
+    text-align: right;
+}
+
+.buttons {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 11px;
+}
+
+button {
+    height: 62px;
+    border: none;
+    border-radius: 16px;
+    background: #35383f;
+    color: white;
+    font-size: 22px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+button:active {
+    transform: scale(0.94);
+}
+
+.special {
+    background: #555a63;
+}
+
+.operator {
+    background: #3f6df6;
+}
+
+.equal {
+    background: #22a06b;
+}
+
+.zero {
+    grid-column: span 2;
+}
+</style>
+</head>
+
+<body>
+
+<div class="calculator">
+
+    <div class="title">MY CALCULATOR</div>
+
+    <input type="text" id="display" readonly>
+
+    <div class="buttons">
+
+        <button class="special" onclick="clearDisplay()">AC</button>
+        <button class="special" onclick="deleteLast()">⌫</button>
+        <button class="special" onclick="percentage()">%</button>
+        <button class="operator" onclick="addValue('/')">÷</button>
+
+        <button onclick="addValue('7')">7</button>
+        <button onclick="addValue('8')">8</button>
+        <button onclick="addValue('9')">9</button>
+        <button class="operator" onclick="addValue('*')">×</button>
+
+        <button onclick="addValue('4')">4</button>
+        <button onclick="addValue('5')">5</button>
+        <button onclick="addValue('6')">6</button>
+        <button class="operator" onclick="addValue('-')">−</button>
+
+        <button onclick="addValue('1')">1</button>
+        <button onclick="addValue('2')">2</button>
+        <button onclick="addValue('3')">3</button>
+        <button class="operator" onclick="addValue('+')">+</button>
+
+        <button class="zero" onclick="addValue('0')">0</button>
+        <button onclick="addValue('.')">.</button>
+        <button class="equal" onclick="calculate()">=</button>
+
+    </div>
+</div>
+
+<script>
+const display = document.getElementById("display");
+
+function addValue(value) {
+    display.value += value;
+}
+
+function clearDisplay() {
+    display.value = "";
+}
+
+function deleteLast() {
+    display.value = display.value.slice(0, -1);
+}
+
+function percentage() {
+
+    let expression = display.value;
+
+    if (expression === "") return;
+
+    // Addition/Subtraction percentage
+    let addSub = expression.match(
+        /^(-?\d+(?:\.\d+)?)([+-])(\d+(?:\.\d+)?)$/
+    );
+
+    if (addSub) {
+
+        let first = Number(addSub[1]);
+        let operator = addSub[2];
+        let second = Number(addSub[3]);
+
+        let percentValue = first * second / 100;
+
+        if (operator === "+") {
+            display.value = first + percentValue;
+        } else {
+            display.value = first - percentValue;
+        }
+
+        return;
+    }
+
+    // Multiplication/Division percentage
+    let mulDiv = expression.match(
+        /^(-?\d+(?:\.\d+)?)([*/])(\d+(?:\.\d+)?)$/
+    );
+
+    if (mulDiv) {
+
+        let first = Number(mulDiv[1]);
+        let operator = mulDiv[2];
+        let second = Number(mulDiv[3]);
+
+        let percentValue = second / 100;
+
+        if (operator === "*") {
+            display.value = first * percentValue;
+        } else {
+            display.value = first / percentValue;
+        }
+
+        return;
+    }
+
+    // Simple percentage
+    let number = Number(expression);
+
+    if (!isNaN(number)) {
+        display.value = number / 100;
+    }
+}
+
+function calculate() {
+
+    try {
+
+        let expression = display.value;
+
+        if (expression === "") return;
+
+        let result = Function(
+            "return " + expression
+        )();
+
+        if (!isFinite(result)) {
+            display.value = "Error";
+        } else {
+            display.value = result;
+        }
+
+    } catch {
+
+        display.value = "Error";
+
+    }
+}
+</script>
+
+</body>
+</html>
